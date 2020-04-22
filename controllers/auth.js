@@ -55,6 +55,8 @@ module.exports.register = async (req, res) => {
       lastName: req.body.user.lastName,
       email: req.body.user.email,
       password: req.body.user.password,
+      wantBeAdmin: !!req.body.user.wantBeAdmin,
+      role: 0
     });
     try {
       await user.save();
@@ -110,7 +112,7 @@ module.exports.requestUpdatePassword = async (req, res) => {
         expiresIn: 60 * 60
       });
       const updated = {
-        token
+        functionalToken:token
       };
       await User.findOneAndUpdate({
         email: candidate.email,
@@ -149,7 +151,7 @@ module.exports.changePassword = async (req, res) => {
       token:''
     }
     await User.findOneAndUpdate({
-      token: req.body.token,
+      functionalToken: req.body.token,
     }, {
       $set: updated
     });

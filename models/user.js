@@ -20,7 +20,19 @@ const userSchema = new Schema({
     type: String,
     required: true
   },
+  //role if 0 default user for admin 1
+  role: {
+    type: Number,
+    required: true
+  },
+  wantBeAdmin: {
+    type: Boolean
+  },
   token: {
+    type: String,
+  },
+  //functional token used for check other operations witch user
+  functionalToken: {
     type: String,
   }
 });
