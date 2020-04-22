@@ -2,12 +2,15 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const fileUpload = require('express-fileupload');
 
 const authRoutes = require('./routes/auth');
 const cleanersRoutes = require('./routes/cleaners');
 const keys = require('./config/keys');
 //Initiate our app
 const app = express();
+//config file upload
+app.use(fileUpload({ safeFileNames: true, preserveExtension: true }))
 // app.use(cors());
 app.use(cors());
 app.use(function (req, res, next) {

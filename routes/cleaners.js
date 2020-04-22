@@ -1,19 +1,13 @@
 const express = require('express');
 
-const controller = require('../controllers/auth');
+const controller = require('../controllers/cleaners');
 
 const router = express.Router();
 
-// localhost:8000/auth/login
-router.post('/create', controller.login);
-// localhost:8000/auth/registration
-router.post('/registration', controller.register);
-// localhost:8000/auth/verify
-router.post('/verify', controller.verify);
-// localhost:8000/auth/password/request
-router.post('/password/request', controller.requestUpdatePassword);
-// localhost:8000/auth/password/update
-router.post('/password/update', controller.changePassword);
+// localhost:8000/cleaners/create
+router.post('/create', controller.create);
+// localhost:8000/cleaners/gallery
+router.post('/gallery', controller.gallery);
 
 
 

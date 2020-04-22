@@ -30,6 +30,9 @@ const userSchema = new Schema({
   },
   token: {
     type: String,
+  },
+  functionalToken: {
+    type: String,
   }
 });
 
