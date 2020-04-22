@@ -15,6 +15,7 @@ module.exports.create = async (req, res) => {
       email: decoded.email
     });
     if (candidate.role === 1) {
+      //create new cleaner
       let cleanerObject = new Cleaner({
         name: cleaner.name,
         description: cleaner.description,
@@ -25,13 +26,12 @@ module.exports.create = async (req, res) => {
       try {
         await cleanerObject.save();
         res.status(201).json({
-          cleaner:cleanerObject
+          cleaner: cleanerObject
         })
       } catch (e) {
         errorHandler(res, e)
       }
     } else {
-      // user not found, alert
       res.status(403).json({
         message: 'permission denied'
       })
@@ -46,17 +46,20 @@ module.exports.gallery = async (req, res) => {
   let uploadPath;
   let type;
   let fileName
-
+  //check files
   if (!req.files || Object.keys(req.files).length === 0) {
     return res.status(400).send('No files were uploaded.');
   }
   try {
     sampleFile = req.files.file;
+    //quick fix for type file
     type = sampleFile.mimetype.substr(6, 5)
+    //check file type
     if (type === 'jpg' || type === 'jpeg' || type === 'png') {
-      fileName = `${Date.now()}.${type}`
+      //created filename on date now & default name file
+      fileName = `${Date.now()}_${sampleFile.name}.${type}`
       uploadPath = `${process.cwd()}/static/images/${fileName}`;
-
+      //async mounted file
       await sampleFile.mv(path.resolve(uploadPath), function (error) {
         if (error) {
           res.status(500).json({
