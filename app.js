@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 
 const authRoutes = require('./routes/auth');
+const cleanersRoutes = require('./routes/cleaners');
 const keys = require('./config/keys');
 //Initiate our app
 const app = express();
@@ -30,6 +31,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.text());
 
 app.use('/auth', authRoutes);
+app.use('/cleaners', cleanersRoutes);
 
 mongoose.set('debug', true);
 

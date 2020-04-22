@@ -55,6 +55,8 @@ module.exports.register = async (req, res) => {
       lastName: req.body.user.lastName,
       email: req.body.user.email,
       password: req.body.user.password,
+      wantBeAdmin: !!req.body.user.wantBeAdmin,
+      role: 0
     });
     try {
       await user.save();
