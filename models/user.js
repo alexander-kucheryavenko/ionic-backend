@@ -31,6 +31,7 @@ const userSchema = new Schema({
   token: {
     type: String,
   },
+  //functional token used for check other operations witch user
   functionalToken: {
     type: String,
   }
