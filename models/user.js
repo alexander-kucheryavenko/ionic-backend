@@ -20,6 +20,9 @@ const userSchema = new Schema({
     type: String,
     required: true
   },
+  token: {
+    type: String,
+  }
 });
 
 userSchema.pre('save', function (next) {
