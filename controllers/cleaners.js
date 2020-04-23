@@ -41,6 +41,107 @@ module.exports.create = async (req, res) => {
   }
 };
 
+module.exports.update = async (req, res) => {
+  try {
+    const {token, cleaner} = req.body
+    const decoded = await jwt.verify(token, keys.jwt);
+    //check user
+    const candidate = await User.findOne({
+      email: decoded.email
+    });
+    if (candidate.role === 1) {
+      //create update object
+      let updated = {
+        name: cleaner.name,
+        description: cleaner.description,
+        createdBy: cleaner.email,
+        gallery: cleaner.gallery,
+        services: cleaner.services
+      };
+      try {
+        await Cleaner.findOneAndUpdate(
+            {
+              email: cleaner.email,
+            },
+            {
+              $set: updated
+            },
+            function (err, doc) {
+              if (err) {
+                errorHandler(res, err)
+              } else {
+                res.status(200).json(doc)
+              }
+            });
+      } catch (e) {
+        errorHandler(res, e)
+      }
+    } else {
+      res.status(403).json({
+        message: 'permission denied'
+      })
+    }
+  } catch (err) {
+    errorHandler(res, err)
+  }
+};
+
+module.exports.get = async (req, res) => {
+  try {
+    const {token} = req.body
+    const decoded = await jwt.verify(token, keys.jwt);
+    //check user
+    const candidate = await User.findOne({
+      email: decoded.email
+    });
+    if (candidate) {
+      const cleaner = await Cleaner.find({
+        email: req.body.email ? req.body.email : decoded.email
+      });
+      if (cleaner) {
+        res.status(201).json(cleaner)
+      } else {
+        res.status(404).json({
+          message: 'not found'
+        })
+      }
+    } else {
+      res.status(403).json({
+        message: 'permission denied'
+      })
+    }
+  } catch (err) {
+    errorHandler(res, err)
+  }
+};
+
+module.exports.getAll = async (req, res) => {
+  try {
+    const {token} = req.body
+    const decoded = await jwt.verify(token, keys.jwt);
+    //check user
+    const candidate = await User.findOne({
+      email: decoded.email
+    });
+    if (candidate) {
+      const cleaners = await Cleaner.find();
+      if (cleaners) {
+        res.status(201).json(cleaners)
+      } else {
+        res.status(404).json({
+          message: 'not found'
+        })
+      }
+    } else {
+      res.status(403).json({
+        message: 'permission denied'
+      })
+    }
+  } catch (err) {
+    errorHandler(res, err)
+  }
+};
+
 module.exports.gallery = async (req, res) => {
   let sampleFile;
   let uploadPath;
