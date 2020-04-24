@@ -6,6 +6,7 @@ const fileUpload = require('express-fileupload');
 
 const authRoutes = require('./routes/auth');
 const cleanersRoutes = require('./routes/cleaners');
+const ordersRoutes = require('./routes/orders');
 const keys = require('./config/keys');
 //Initiate our app
 const app = express();
@@ -35,6 +36,7 @@ app.use(bodyParser.text());
 
 app.use('/auth', authRoutes);
 app.use('/cleaners', cleanersRoutes);
+app.use('/orders', ordersRoutes);
 
 mongoose.set('debug', true);
 

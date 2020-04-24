@@ -4,6 +4,8 @@ const Schema = mongoose.Schema;
 const cleanerSchema = new Schema({
   name: {
     type: String,
+    required: true,
+    unique: true
   },
   description: {
     type: String,

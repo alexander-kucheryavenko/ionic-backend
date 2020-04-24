@@ -16,20 +16,29 @@ module.exports.create = async (req, res) => {
     });
     if (candidate.role === 1) {
       //create new cleaner
-      let cleanerObject = new Cleaner({
-        name: cleaner.name,
-        description: cleaner.description,
-        createdBy: candidate.email,
-        gallery: cleaner.gallery,
-        services: cleaner.services
+      const checkCleaner = await Cleaner.findOne({
+        name: cleaner.name
       });
-      try {
-        await cleanerObject.save();
-        res.status(201).json({
-          cleaner: cleanerObject
+      if (checkCleaner) {
+        res.status(409).json({
+          message: 'such an name is already taken'
         })
-      } catch (e) {
-        errorHandler(res, e)
+      } else {
+        let cleanerObject = new Cleaner({
+          name: cleaner.name,
+          description: cleaner.description,
+          createdBy: candidate.email,
+          gallery: cleaner.gallery,
+          services: cleaner.services
+        });
+        try {
+          await cleanerObject.save();
+          res.status(201).json({
+            cleaner: cleanerObject
+          })
+        } catch (e) {
+          errorHandler(res, e)
+        }
       }
     } else {
       res.status(403).json({
@@ -66,7 +75,7 @@ module.exports.update = async (req, res) => {
             {
               $set: updated
             },
-            function (err, doc) {
+            async function (err, doc) {
               if (err) {
                 errorHandler(res, err)
               } else {

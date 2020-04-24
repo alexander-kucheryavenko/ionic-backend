@@ -4,5 +4,5 @@ module.exports = {
   jwt: 'dev-jwt',
   emailFrom: 'mchaw0786@gmail.com',
   gmailPassword: 'H8cHPMumctTSoZ3U',
-  appUrl: 'btl.com'
+  appUrl: 'api-ionik.com'
 };
