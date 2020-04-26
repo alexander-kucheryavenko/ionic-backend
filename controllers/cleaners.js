@@ -75,6 +75,7 @@ module.exports.update = async (req, res) => {
             {
               $set: updated
             },
+            {new: true},
             async function (err, doc) {
               if (err) {
                 errorHandler(res, err)

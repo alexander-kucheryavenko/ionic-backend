@@ -13,7 +13,6 @@ module.exports.create = async (req, res) => {
     const candidate = await User.findOne({
       email: decoded.email
     });
-    console.log('----->order', order)
     if (candidate) {
       //create new cleaner
       let orderObject = new Order({
@@ -30,13 +29,36 @@ module.exports.create = async (req, res) => {
           howChange: candidate.email,
           date: new Date(),
           whatToChange: 'created',
-        }
+        },
+        comment: `created ${candidate.email}-${new Date()}`
       });
       try {
-        await orderObject.save();
-        res.status(201).json({
-          order: orderObject
-        })
+        //if user has enough many
+        if (candidate.balance > order.price) {
+          const updated = {
+            balance: candidate.balance - order.price
+          }
+          await User.findOneAndUpdate(
+              {
+                _id: candidate._id,
+              },
+              {
+                $set: updated
+              },
+              {new: true},
+              async function (err, doc) {
+                if (err) {
+                  errorHandler(res, err)
+                } else {
+                   const order = await orderObject.save();
+                  res.status(200).json({order, doc})
+                }
+              });
+        } else {
+          res.status(403).json({
+            message: 'not enough money, replenish balance and try again!!'
+          })
+        }
       } catch (e) {
         errorHandler(res, e)
       }
@@ -68,7 +90,8 @@ module.exports.update = async (req, res) => {
           howChange: candidate.email,
           date: new Date(),
           whatToChange: order.status,
-        }
+        },
+        comment: req.body.comment
       };
       try {
         await Order.findOneAndUpdate(
@@ -78,11 +101,34 @@ module.exports.update = async (req, res) => {
             {
               $set: updated
             },
+            {new: true},
             async function (err, doc) {
               if (err) {
                 errorHandler(res, err)
               } else {
-                res.status(200).json(doc)
+                //if status return we need return many
+                if (doc.status === 'return') {
+                  const updated = {
+                    balance: candidate.balance + doc.price
+                  }
+                  await User.findOneAndUpdate(
+                      {
+                        _id: candidate._id,
+                      },
+                      {
+                        $set: updated
+                      },
+                      {new: true},
+                      async function (err, usr) {
+                        if (err) {
+                          errorHandler(res, err)
+                        } else {
+                          res.status(200).json({doc, usr})
+                        }
+                      });
+                } else {
+                  res.status(200).json(doc)
+                }
               }
             });
       } catch (e) {
@@ -100,22 +146,37 @@ module.exports.update = async (req, res) => {
 
 module.exports.get = async (req, res) => {
   try {
-    const {token, id} = req.body
+    const {token} = req.body
     const decoded = await jwt.verify(token, keys.jwt);
     //check user
     const candidate = await User.findOne({
       email: decoded.email
     });
+
     if (candidate) {
-      const order = await Order.find({
-        _id: id
-      });
-      if (order) {
-        res.status(201).json(order)
+
+      if (req.body.id) {
+        const order = await Order.find({
+          _id: req.body.id
+        });
+        if (order) {
+          res.status(201).json(order)
+        } else {
+          res.status(404).json({
+            message: 'not found'
+          })
+        }
       } else {
-        res.status(404).json({
-          message: 'not found'
-        })
+        const order = await Order.find({
+          createdBy: decoded.email
+        });
+        if (order) {
+          res.status(201).json(order)
+        } else {
+          res.status(404).json({
+            message: 'not found'
+          })
+        }
       }
     } else {
       res.status(403).json({
@@ -143,6 +204,84 @@ module.exports.getAll = async (req, res) => {
         res.status(404).json({
           message: 'not found'
         })
+      }
+    } else {
+      res.status(403).json({
+        message: 'permission denied'
+      })
+    }
+  } catch (err) {
+    errorHandler(res, err)
+  }
+};
+
+module.exports.delete = async (req, res) => {
+  try {
+    const {token} = req.body
+    const decoded = await jwt.verify(token, keys.jwt);
+    //check user
+    const candidate = await User.findOne({
+      email: decoded.email
+    });
+    if (candidate) {
+      try {
+        if (req.body.id) {
+          const order = await Order.findOneAndDelete({
+            _id: req.body.id
+          });
+          const updated = {
+            balance: candidate.balance + order.price
+          }
+          await User.findOneAndUpdate(
+              {
+                _id: candidate._id,
+              },
+              {
+                $set: updated
+              },
+              {new: true},
+              async function (err, usr) {
+                if (err) {
+                  errorHandler(res, err)
+                } else {
+                  res.status(200).json({order, usr})
+                }
+              });
+        } else {
+          const orders = await Order.remove({
+            createdBy: candidate.email
+          })
+          if (orders) {
+            let newBalance = candidate.balance
+
+            await orders.map((order) => (newBalance += order.price))
+            const updated = {
+              balance: newBalance
+            }
+
+            await User.findOneAndUpdate(
+                {
+                  _id: candidate._id,
+                },
+                {
+                  $set: updated
+                },
+                {new: true},
+                async function (err, usr) {
+                  if (err) {
+                    errorHandler(res, err)
+                  } else {
+                    res.status(200).json({orders, usr})
+                  }
+                });
+          } else {
+            res.status(404).json({
+              message: 'not found'
+            })
+          }
+        }
+      } catch (err) {
+        errorHandler(res, err)
       }
     } else {
       res.status(403).json({
