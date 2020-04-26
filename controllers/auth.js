@@ -7,6 +7,11 @@ const errorHandler = require('../routes/utils/errorHandler');
 const MailService = require('../services/mail.service');
 const saltWork = 10;
 
+const randomInteger = (min, max) => {
+  let rand = min + Math.random() * (max + 1 - min);
+  return Math.floor(rand);
+}
+
 module.exports.login = async (req, res) => {
   const candidate = await User.findOne({
     email: req.body.user.email
@@ -55,6 +60,7 @@ module.exports.register = async (req, res) => {
       lastName: req.body.user.lastName,
       email: req.body.user.email,
       password: req.body.user.password,
+      balance: randomInteger(0, 500),
       wantBeAdmin: !!req.body.user.wantBeAdmin,
       role: 0
     });

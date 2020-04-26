@@ -20,6 +20,10 @@ const userSchema = new Schema({
     type: String,
     required: true
   },
+  balance:{
+    type: Number,
+    required: true
+  },
   //role if 0 default user for admin 1
   role: {
     type: Number,
