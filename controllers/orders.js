@@ -29,7 +29,8 @@ module.exports.create = async (req, res) => {
           howChange: candidate.email,
           date: new Date(),
           whatToChange: 'created',
-        }
+        },
+        comment: `created ${candidate.email}-${new Date()}`
       });
       try {
         //if user has enough many
@@ -44,12 +45,13 @@ module.exports.create = async (req, res) => {
               {
                 $set: updated
               },
+              {new: true},
               async function (err, doc) {
                 if (err) {
                   errorHandler(res, err)
                 } else {
-                  await orderObject.save();
-                  res.status(200).json(doc)
+                   const order = await orderObject.save();
+                  res.status(200).json({order, doc})
                 }
               });
         } else {
@@ -88,7 +90,8 @@ module.exports.update = async (req, res) => {
           howChange: candidate.email,
           date: new Date(),
           whatToChange: order.status,
-        }
+        },
+        comment: req.body.comment
       };
       try {
         await Order.findOneAndUpdate(
@@ -98,6 +101,7 @@ module.exports.update = async (req, res) => {
             {
               $set: updated
             },
+            {new: true},
             async function (err, doc) {
               if (err) {
                 errorHandler(res, err)
@@ -114,6 +118,7 @@ module.exports.update = async (req, res) => {
                       {
                         $set: updated
                       },
+                      {new: true},
                       async function (err, usr) {
                         if (err) {
                           errorHandler(res, err)
@@ -234,6 +239,7 @@ module.exports.delete = async (req, res) => {
               {
                 $set: updated
               },
+              {new: true},
               async function (err, usr) {
                 if (err) {
                   errorHandler(res, err)
@@ -245,7 +251,7 @@ module.exports.delete = async (req, res) => {
           const orders = await Order.remove({
             createdBy: candidate.email
           })
-          if(orders) {
+          if (orders) {
             let newBalance = candidate.balance
 
             await orders.map((order) => (newBalance += order.price))
@@ -260,6 +266,7 @@ module.exports.delete = async (req, res) => {
                 {
                   $set: updated
                 },
+                {new: true},
                 async function (err, usr) {
                   if (err) {
                     errorHandler(res, err)

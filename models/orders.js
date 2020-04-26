@@ -22,6 +22,9 @@ const orderSchema = new Schema({
   status:{
     type: String,
   },
+  comment:{
+    type: String,
+  },
   lastChange: {
     howChange: String,
     date: Date,
