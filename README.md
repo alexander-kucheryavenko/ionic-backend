@@ -6,10 +6,20 @@
 + installed mongoDB
     + https://docs.mongodb.com/manual/installation/
 ### Super Easy Install
-You need to add keys.js in /config. Templates in mock.keys.js
+You need to add keys.js in /config. Templates in mock.keys.js 
+
+
+Pay attention to the fields {emailFrom: ' ', gmailPassword: ' '}. Set them real to use Mail.service. 
+
+You can also use without them the application will not break
 ```
 yarn 
 yarn start
+```
+or 
+```
+yarn 
+yarn start-dev
 ```
 
 Congratulations, the server is running locally! 🎉🎉🎉

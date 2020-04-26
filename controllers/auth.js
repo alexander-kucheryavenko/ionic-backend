@@ -73,10 +73,10 @@ module.exports.register = async (req, res) => {
         expiresIn: 60 * 60
       });
       const text = `<div><h4>You are registered on our service. Congratulations!</h4><p>Use your email in order to login ${user.email}</p></div>`
-      await MailService.sendSubscribeEmail(user.email, text)
       res.status(201).json({
         token,
       })
+      await MailService.sendSubscribeEmail(user.email, text)
     } catch (e) {
       errorHandler(res, e)
     }
@@ -133,11 +133,11 @@ module.exports.requestUpdatePassword = async (req, res) => {
  in your account will be reset password ${candidate.email}</p>
  </div>
 `
-      //call to mail service for redirect to update password route
-      await MailService.sendSubscribeEmail(candidate.email, text)
       res.status(201).json({
         message: 'Message sent'
       })
+      //call to mail service for redirect to update password route
+      await MailService.sendSubscribeEmail(candidate.email, text)
     } else {
       res.status(404).json({
         message: 'user not found'
