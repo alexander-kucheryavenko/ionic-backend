@@ -129,7 +129,7 @@ module.exports.requestUpdatePassword = async (req, res) => {
       const text = `<div>
 <h4>Do you want to update your password?</h4>
 <p>when you click on this 
-<a href="localhost:3000/updatePassword/token=${token}">link</a>
+<a target="_blank" href="http//localhost:3000/update-password/?token=${token}">link</a>
  in your account will be reset password ${candidate.email}</p>
  </div>
 `
