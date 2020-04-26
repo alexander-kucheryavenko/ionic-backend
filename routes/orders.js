@@ -12,6 +12,8 @@ router.post('/get', controller.get);
 router.post('/getall', controller.getAll);
 // localhost:8000/orders/update
 router.post('/update', controller.update);
+// localhost:8000/orders/delete
+router.post('/delete', controller.delete);
 
 
 module.exports = router;
