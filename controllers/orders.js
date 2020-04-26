@@ -221,7 +221,7 @@ module.exports.delete = async (req, res) => {
     if (candidate) {
       try {
         if (req.body.id) {
-           const order = await Order.findOneAndDelete({
+          const order = await Order.findOneAndDelete({
             _id: req.body.id
           });
           const updated = {
@@ -242,12 +242,36 @@ module.exports.delete = async (req, res) => {
                 }
               });
         } else {
-          await Order.remove({
+          const orders = await Order.remove({
             createdBy: candidate.email
           })
-          res.status(200).json({
-            message: 'deleted all'
-          })
+          if(orders) {
+            let newBalance = candidate.balance
+
+            await orders.map((order) => (newBalance += order.price))
+            const updated = {
+              balance: newBalance
+            }
+
+            await User.findOneAndUpdate(
+                {
+                  _id: candidate._id,
+                },
+                {
+                  $set: updated
+                },
+                async function (err, usr) {
+                  if (err) {
+                    errorHandler(res, err)
+                  } else {
+                    res.status(200).json({orders, usr})
+                  }
+                });
+          } else {
+            res.status(404).json({
+              message: 'not found'
+            })
+          }
         }
       } catch (err) {
         errorHandler(res, err)
