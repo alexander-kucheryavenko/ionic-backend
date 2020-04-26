@@ -84,7 +84,6 @@ module.exports.update = async (req, res) => {
       //create update object
       let updated = {
         name: order.name,
-        price: order.price,
         status: order.status,
         lastChange: {
           howChange: candidate.email,
@@ -94,7 +93,7 @@ module.exports.update = async (req, res) => {
         comment: req.body.comment
       };
       try {
-        await Order.findOneAndUpdate(
+       const newOrder = await Order.findOneAndUpdate(
             {
               _id: order._id,
             },
@@ -107,13 +106,16 @@ module.exports.update = async (req, res) => {
                 errorHandler(res, err)
               } else {
                 //if status return we need return many
-                if (doc.status === 'return') {
+                if (order.status === 'return') {
+                  const newUser = await User.findOne({
+                    email: doc.createdBy
+                  });
                   const updated = {
-                    balance: candidate.balance + doc.price
+                    balance: newUser.balance + doc.price
                   }
                   await User.findOneAndUpdate(
                       {
-                        _id: candidate._id,
+                        _id: newUser._id,
                       },
                       {
                         $set: updated
