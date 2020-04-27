@@ -14,11 +14,7 @@ const cleanerSchema = new Schema({
     type: String,
     required: true,
   },
-  gallery: [
-    {
-      filePath: String
-    }
-  ],
+  gallery: [String],
   services: [
     {
       name: String,

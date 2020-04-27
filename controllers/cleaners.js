@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const path = require('path');
-
+const fs = require('fs');
 const User = require('../models/user');
 const Cleaner = require('../models/cleaners')
 const keys = require('../config/keys');
@@ -153,40 +153,28 @@ module.exports.getAll = async (req, res) => {
 };
 
 module.exports.gallery = async (req, res) => {
-  let sampleFile;
   let uploadPath;
-  let type;
-  let fileName
-  //check files
-  if (!req.files || Object.keys(req.files).length === 0) {
-    return res.status(400).send('No files were uploaded.');
-  }
+  let fileName;
+  let getPath;
   try {
-    sampleFile = req.files.file;
-    //quick fix for type file
-    type = sampleFile.mimetype.substr(6, 5)
-    //check file type
-    if (type === 'jpg' || type === 'jpeg' || type === 'png') {
-      //created filename on date now & default name file
-      fileName = `${Date.now()}_${sampleFile.name}.${type}`
-      uploadPath = `${process.cwd()}/static/images/${fileName}`;
-      //async mounted file
-      await sampleFile.mv(path.resolve(uploadPath), function (error) {
-        if (error) {
-          res.status(500).json({
-            message: 'something went wrong'
-          })
-        }
-      })
-      res.status(200).json({
-        message: 'successfully',
-        path: uploadPath
-      })
-    } else {
-      res.status(500).json({
-        message: 'something went wrong'
-      })
-    }
+    const{dataUrl, format} = req.body.file
+    fileName = `${Date.now()}_photo.${format}`
+    // Remove header
+    const base64Image = dataUrl.replace(/^data:([A-Za-z-+/]+);base64,/, '');
+    uploadPath = `${process.cwd()}/static/images/${fileName}`;
+    getPath=`http://localhost:8000/img/${fileName}`
+    fs.writeFile(uploadPath, base64Image, 'base64', function(error) {
+      if (error) {
+        res.status(500).json({
+          message: 'something went wrong'
+        })
+      } else {
+        res.status(200).json({
+          message: 'successfully',
+          path: getPath
+        })
+      }
+    });
   } catch (e) {
     errorHandler(res, e)
   }

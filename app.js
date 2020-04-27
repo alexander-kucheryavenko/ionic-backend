@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const fileUpload = require('express-fileupload');
-
+const path =require('path')
 const authRoutes = require('./routes/auth');
 const cleanersRoutes = require('./routes/cleaners');
 const ordersRoutes = require('./routes/orders');
@@ -46,8 +46,9 @@ connectWithRetry()
 app.use(bodyParser.urlencoded({
   extended: true
 }));
-app.use(bodyParser.json());
-app.use(bodyParser.text());
+app.use(bodyParser.json({limit: '50mb', extended: true}));
+app.use(bodyParser.text({limit: '50mb', extended: true}));
+app.use('/img',express.static(path.join(__dirname, '/static/images')))
 
 app.use('/auth', authRoutes);
 app.use('/cleaners', cleanersRoutes);
