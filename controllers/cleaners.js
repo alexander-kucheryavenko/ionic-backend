@@ -70,7 +70,7 @@ module.exports.update = async (req, res) => {
       try {
         await Cleaner.findOneAndUpdate(
             {
-              email: cleaner.email,
+              _id: cleaner._id,
             },
             {
               $set: updated
